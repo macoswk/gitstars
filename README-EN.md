@@ -50,3 +50,32 @@ Github will statistically analyze the files of the Repository and determine the 
 ## 🤖 Vercel deployment
 
 [WIKI Vercel deployment](https://github.com/cfour-hi/gitstars/wiki/Vercel-%E9%83%A8%E7%BD%B2)
+
+## 🐳 Docker deployment
+
+1. Create an OAuth App in [GitHub Developer Settings](https://github.com/settings/developers), then set its `Authorization callback URL` to `https://localhost:8080`.
+2. Copy the environment template and enter the OAuth App's Client ID and Client Secret:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+3. Generate and trust a local HTTPS certificate with [mkcert](https://github.com/FiloSottile/mkcert):
+
+   ```bash
+   pnpm cert:local
+   ```
+
+4. Build and start the service:
+
+   ```bash
+   docker compose up -d --build
+   ```
+
+The service is available at [https://localhost:8080](https://localhost:8080) by default, and its health endpoint is `https://localhost:8080/healthz`. Certificates are mounted read-only and are not stored in the image. Set `GITSTARS_PORT` in `.env` to use another host port, or `GITSTARS_CERT_DIR` to use another certificate directory. The Client ID is embedded in the frontend during the build, so rebuild after changing it. The Client Secret is injected only at runtime and is not stored in the image.
+
+Stop the service with:
+
+```bash
+docker compose down
+```

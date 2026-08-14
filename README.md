@@ -52,3 +52,32 @@ Github 会统计分析 Repository 的文件，确定 Repository 的主编程语�
 ## 🤖 Vercel 部署
 
 [WIKI Vercel 部署](https://github.com/cfour-hi/gitstars/wiki/Vercel-%E9%83%A8%E7%BD%B2)
+
+## 🐳 Docker 部署
+
+1. 在 [GitHub Developer Settings](https://github.com/settings/developers) 创建 OAuth App，并将 `Authorization callback URL` 设置为 `https://localhost:8080`。
+2. 复制环境变量模板并填写 OAuth App 的 Client ID 和 Client Secret：
+
+   ```bash
+   cp .env.example .env
+   ```
+
+3. 使用 [mkcert](https://github.com/FiloSottile/mkcert) 生成并信任本地 HTTPS 证书：
+
+   ```bash
+   pnpm cert:local
+   ```
+
+4. 构建并启动服务：
+
+   ```bash
+   docker compose up -d --build
+   ```
+
+服务默认监听 [https://localhost:8080](https://localhost:8080)，健康检查地址为 `https://localhost:8080/healthz`。证书只读挂载到容器中，不会写入镜像。如需修改宿主机端口，请在 `.env` 中设置 `GITSTARS_PORT`；如需修改证书目录，请设置 `GITSTARS_CERT_DIR`。Client ID 会在构建前端时写入静态资源，修改后需要重新构建。Client Secret 只在容器运行时注入，不会写入镜像。
+
+停止服务：
+
+```bash
+docker compose down
+```
